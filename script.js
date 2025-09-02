@@ -1,7 +1,7 @@
 // Eventure - Mini-Adventure Generator
 // Configuration
 const GEMINI_API_KEY = 'AIzaSyBuyDNfsD6He3YepSRDY-10X5dkQKhZ_UI';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 // DOM Elements
 const locationInput = document.getElementById('location');
@@ -134,33 +134,27 @@ function getDurationText(minutes) {
     return durationMap[minutes] || `${minutes} minutes`;
 }
 
-// Call Gemini API
+// Call Gemini API through our local server
 async function callGeminiAPI(prompt) {
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch('http://localhost:5000/generate-adventure', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
-            }],
-            generationConfig: {
-                temperature: 0.9,
-                topK: 40,
-                topP: 0.95,
-                maxOutputTokens: 1024,
-            }
-        })
+        body: JSON.stringify({ prompt })
     });
 
     if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(`API request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
     }
 
     const data = await response.json();
+    
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+        throw new Error('Invalid response format from API');
+    }
+    
     const generatedText = data.candidates[0].content.parts[0].text;
     
     // Extract JSON from the response
