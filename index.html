@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventure - Turn Everyday Moments into Mini-Adventures</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <h1>🎯 Eventure</h1>
+                <p>Turn Everyday Moments into Mini-Adventures</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Adventure Spinner Section -->
+            <section class="adventure-spinner" id="adventureSpinner">
+                <div class="spinner-header">
+                    <h2>✨ Adventure Spinner</h2>
+                    <p>Tell us your vibe and we'll spin up something amazing!</p>
+                </div>
+
+                <div class="input-form">
+                    <div class="input-group">
+                        <label for="location">📍 Where are you?</label>
+                        <input type="text" id="location" placeholder="Enter your city or zip code" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="mood">🎭 What's your vibe?</label>
+                        <select id="mood" required>
+                            <option value="">Choose your mood...</option>
+                            <option value="chill">😌 Chill - Just want to relax</option>
+                            <option value="active">🏃‍♀️ Active - Ready to move!</option>
+                            <option value="creative">🎨 Creative - Feeling artsy</option>
+                            <option value="social">👥 Social - Want to hang with friends</option>
+                            <option value="adventurous">🗺️ Adventurous - Ready for anything!</option>
+                            <option value="foodie">🍕 Foodie - All about the eats</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="duration">⏰ How much time do you have?</label>
+                        <select id="duration" required>
+                            <option value="">Select duration...</option>
+                            <option value="30">30 minutes - Quick adventure</option>
+                            <option value="60">1 hour - Perfect break</option>
+                            <option value="120">2 hours - Afternoon vibes</option>
+                            <option value="240">4 hours - Half day adventure</option>
+                            <option value="480">8+ hours - Full day mission</option>
+                        </select>
+                    </div>
+
+                    <button class="spin-button" id="spinButton">
+                        <span class="button-text">🎲 Spin My Adventure!</span>
+                        <div class="spinner" id="spinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Adventure Result Section -->
+            <section class="adventure-result" id="adventureResult" style="display: none;">
+                <div class="result-header">
+                    <h2>🎉 Your Adventure Awaits!</h2>
+                    <button class="new-adventure-btn" id="newAdventureBtn">✨ Try Another Adventure</button>
+                </div>
+                
+                <div class="adventure-card" id="adventureCard">
+                    <!-- Adventure content will be populated here -->
+                </div>
+
+                <div class="action-buttons">
+                    <button class="save-btn" id="saveBtn">💾 Save to Memory Capsule</button>
+                    <button class="share-btn" id="shareBtn">📱 Share with Friends</button>
+                </div>
+            </section>
+
+            <!-- Memory Capsule Section -->
+            <section class="memory-capsule" id="memoryCapsule" style="display: none;">
+                <div class="capsule-header">
+                    <h2>📸 Memory Capsule</h2>
+                    <p>Your saved adventures</p>
+                </div>
+                
+                <div class="memories-grid" id="memoriesGrid">
+                    <!-- Saved memories will be displayed here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with 💜 for teens who refuse to be bored</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
