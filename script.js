@@ -7,6 +7,9 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/
 const locationInput = document.getElementById('location');
 const moodSelect = document.getElementById('mood');
 const durationSelect = document.getElementById('duration');
+const budgetSelect = document.getElementById('budget');
+const energySelect = document.getElementById('energy');
+const multipleOptionsCheckbox = document.getElementById('multipleOptions');
 const spinButton = document.getElementById('spinButton');
 const spinner = document.getElementById('spinner');
 const adventureSpinner = document.getElementById('adventureSpinner');
@@ -17,15 +20,23 @@ const saveBtn = document.getElementById('saveBtn');
 const shareBtn = document.getElementById('shareBtn');
 const memoryCapsule = document.getElementById('memoryCapsule');
 const memoriesGrid = document.getElementById('memoriesGrid');
+const groupSpinBtn = document.getElementById('groupSpinBtn');
+const invitedFriendsDiv = document.getElementById('invitedFriends');
 
 // State
 let currentAdventure = null;
 let savedMemories = JSON.parse(localStorage.getItem('eventureMemories')) || [];
+let invitedFriends = [];
+let currentTab = 'adventures';
+let multipleAdventures = [];
+let streamController = null;
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     loadSavedMemories();
     setupEventListeners();
+    setupTabNavigation();
+    updateInvitedFriendsDisplay();
 });
 
 // Event Listeners
@@ -34,9 +45,10 @@ function setupEventListeners() {
     newAdventureBtn.addEventListener('click', showAdventureSpinner);
     saveBtn.addEventListener('click', saveAdventure);
     shareBtn.addEventListener('click', shareAdventure);
+    groupSpinBtn.addEventListener('click', generateGroupAdventure);
     
     // Enter key support for inputs
-    [locationInput, moodSelect, durationSelect].forEach(element => {
+    [locationInput, moodSelect, durationSelect, budgetSelect, energySelect].forEach(element => {
         element.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 generateAdventure();
@@ -45,14 +57,113 @@ function setupEventListeners() {
     });
 }
 
+// Setup Tab Navigation
+function setupTabNavigation() {
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.getAttribute('data-tab');
+            switchTab(targetTab);
+        });
+    });
+}
+
+// Switch Tab Function
+function switchTab(tabName) {
+    currentTab = tabName;
+    
+    // Update nav tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    
+    // Update tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    const targetContent = document.getElementById(`${tabName}Tab`);
+    if (targetContent) {
+        targetContent.style.display = 'block';
+    }
+    
+    // Handle memory capsule visibility
+    if (tabName === 'memories') {
+        memoryCapsule.style.display = 'block';
+        loadSavedMemories();
+    }
+}
+
+// Friends Management
+function inviteFriend(friendId) {
+    const friendCard = document.querySelector(`[data-friend="${friendId}"]`);
+    const inviteBtn = friendCard.querySelector('.invite-btn');
+    
+    const friends = {
+        'alex': { name: 'Alex Chen', emoji: '🧑‍🎨', preferences: ['creative', 'chill'] },
+        'sarah': { name: 'Sarah Kim', emoji: '🏃‍♀️', preferences: ['active', 'adventurous'] },
+        'marcus': { name: 'Marcus Rivera', emoji: '🍕', preferences: ['foodie', 'social'] },
+        'zoe': { name: 'Zoe Thompson', emoji: '🎭', preferences: ['social', 'adventurous'] }
+    };
+    
+    if (invitedFriends.includes(friendId)) {
+        // Remove friend
+        invitedFriends = invitedFriends.filter(id => id !== friendId);
+        friendCard.classList.remove('invited');
+        inviteBtn.classList.remove('invited');
+        inviteBtn.textContent = 'Invite';
+    } else {
+        // Add friend
+        invitedFriends.push(friendId);
+        friendCard.classList.add('invited');
+        inviteBtn.classList.add('invited');
+        inviteBtn.textContent = 'Invited!';
+    }
+    
+    updateInvitedFriendsDisplay();
+    groupSpinBtn.disabled = invitedFriends.length === 0;
+}
+
+// Update Invited Friends Display
+function updateInvitedFriendsDisplay() {
+    const friends = {
+        'alex': { name: 'Alex Chen', emoji: '🧑‍🎨' },
+        'sarah': { name: 'Sarah Kim', emoji: '🏃‍♀️' },
+        'marcus': { name: 'Marcus Rivera', emoji: '🍕' },
+        'zoe': { name: 'Zoe Thompson', emoji: '🎭' }
+    };
+    
+    if (invitedFriends.length === 0) {
+        invitedFriendsDiv.innerHTML = '<p>No friends invited yet. Select some friends above!</p>';
+        return;
+    }
+    
+    const friendTags = invitedFriends.map(friendId => {
+        const friend = friends[friendId];
+        return `
+            <div class="invited-friend-tag">
+                <span>${friend.emoji} ${friend.name}</span>
+                <button class="remove-friend" onclick="inviteFriend('${friendId}')">×</button>
+            </div>
+        `;
+    }).join('');
+    
+    invitedFriendsDiv.innerHTML = friendTags;
+}
+
 // Generate Adventure using Gemini API
 async function generateAdventure() {
     const location = locationInput.value.trim();
     const mood = moodSelect.value;
     const duration = durationSelect.value;
+    const budget = budgetSelect.value;
+    const energy = energySelect.value;
 
     if (!location || !mood || !duration) {
-        showNotification('Please fill in all fields!', 'error');
+        showNotification('Please fill in all required fields!', 'error');
         return;
     }
 
@@ -60,18 +171,34 @@ async function generateAdventure() {
     setLoadingState(true);
     
     try {
-        const prompt = createAdventurePrompt(location, mood, duration);
-        const adventure = await callGeminiAPI(prompt);
+        const prompt = createAdventurePrompt(location, mood, duration, budget, energy);
+        const result = await callGeminiAPIWithStreaming(prompt);
         
-        currentAdventure = {
-            ...adventure,
-            location,
-            mood,
-            duration,
-            timestamp: new Date().toISOString()
-        };
+        if (multipleOptionsCheckbox.checked && result.adventures) {
+            multipleAdventures = result.adventures.map(adventure => ({
+                ...adventure,
+                location,
+                mood,
+                duration,
+                budget,
+                energy,
+                timestamp: new Date().toISOString()
+            }));
+            displayMultipleAdventures(multipleAdventures);
+        } else {
+            const adventure = result.adventures ? result.adventures[0] : result;
+            currentAdventure = {
+                ...adventure,
+                location,
+                mood,
+                duration,
+                budget,
+                energy,
+                timestamp: new Date().toISOString()
+            };
+            displayAdventure(currentAdventure);
+        }
         
-        displayAdventure(currentAdventure);
         showAdventureResult();
         
     } catch (error) {
@@ -82,8 +209,46 @@ async function generateAdventure() {
     }
 }
 
+// Generate Group Adventure
+async function generateGroupAdventure() {
+    const location = locationInput.value.trim() || 'your area';
+    
+    if (invitedFriends.length === 0) {
+        showNotification('Please invite some friends first!', 'error');
+        return;
+    }
+    
+    setLoadingState(true);
+    
+    try {
+        const prompt = createAdventurePrompt(location, 'social', '120', '', '', true, invitedFriends);
+        const result = await callGeminiAPIWithStreaming(prompt);
+        
+        const adventure = result.adventures ? result.adventures[0] : result;
+        currentAdventure = {
+            ...adventure,
+            location,
+            mood: 'social',
+            duration: '120',
+            isGroup: true,
+            friends: invitedFriends,
+            timestamp: new Date().toISOString()
+        };
+        
+        displayAdventure(currentAdventure);
+        showAdventureResult();
+        switchTab('adventures');
+        
+    } catch (error) {
+        console.error('Error generating group adventure:', error);
+        showNotification('Oops! Something went wrong. Try again!', 'error');
+    } finally {
+        setLoadingState(false);
+    }
+}
+
 // Create the prompt for Gemini API
-function createAdventurePrompt(location, mood, duration) {
+function createAdventurePrompt(location, mood, duration, budget = '', energy = '', isGroup = false, friends = []) {
     const durationText = getDurationText(duration);
     const moodEmojis = {
         'chill': '😌',
@@ -94,22 +259,57 @@ function createAdventurePrompt(location, mood, duration) {
         'foodie': '🍕'
     };
 
-    return `You are Eventure, a fun app that creates spontaneous mini-adventures for teens. Generate a creative, specific, and exciting micro-adventure based on these details:
+    let budgetText = budget ? `\nBudget: ${budget}` : '';
+    let energyText = energy ? `\nEnergy Level: ${energy}` : '';
+    let groupText = '';
+    
+    if (isGroup && friends.length > 0) {
+        const friendList = friends.map(id => {
+            const friendData = {
+                'alex': 'Alex (creative, loves art)',
+                'sarah': 'Sarah (active, loves sports)',
+                'marcus': 'Marcus (foodie, loves restaurants)',
+                'zoe': 'Zoe (social butterfly, loves events)'
+            };
+            return friendData[id];
+        }).join(', ');
+        groupText = `\nGroup Size: ${friends.length + 1} people (You + ${friendList})`;
+    }
+
+    const multipleOptions = document.getElementById('multipleOptions').checked;
+    const optionsText = multipleOptions ? '\n\nGenerate 3-5 different adventure options in an array format.' : '';
+
+    return `You are Eventure, a fun app that creates spontaneous mini-adventures for teens. Generate creative, specific, and exciting micro-adventure${multipleOptions ? 's' : ''} based on these details:
 
 Location: ${location}
 Mood: ${mood} ${moodEmojis[mood]}
-Duration: ${durationText}
+Duration: ${durationText}${budgetText}${energyText}${groupText}
 
-Create a unique adventure that:
-- Is specific to the location (mention actual places, neighborhoods, or local spots when possible)
-- Matches the mood perfectly
-- Fits the time constraint
-- Is fun and engaging for teens
-- Includes creative, unexpected elements
-- Is safe and realistic
+Create ${multipleOptions ? 'multiple unique adventures' : 'a unique adventure'} that:
+- ${multipleOptions ? 'Are' : 'Is'} specific to the location (mention actual places, neighborhoods, or local spots when possible)
+- Match${multipleOptions ? '' : 'es'} the mood perfectly
+- Fit${multipleOptions ? '' : 's'} the time constraint
+- ${multipleOptions ? 'Are' : 'Is'} fun and engaging for teens
+- Include${multipleOptions ? '' : 's'} creative, unexpected elements
+- ${multipleOptions ? 'Are' : 'Is'} safe and realistic
+${budget ? `- Stay${multipleOptions ? '' : 's'} within the ${budget} budget range` : ''}
+${energy ? `- Match${multipleOptions ? '' : 'es'} the ${energy} energy level` : ''}
+${isGroup ? `- ${multipleOptions ? 'Are' : 'Is'} perfect for a group of ${friends.length + 1} people` : ''}
 
 Return your response in this EXACT JSON format:
-{
+${multipleOptions ? `{
+  "adventures": [
+    {
+      "title": "Creative adventure title with emojis",
+      "description": "Detailed description of what to do, where to go, and how to make it fun",
+      "location": "Specific location or area within ${location}",
+      "estimatedTime": "${durationText}",
+      "mood": "${mood}",
+      "tips": ["Tip 1", "Tip 2", "Tip 3"],
+      "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
+    }
+  ]
+}` : `{
   "title": "Creative adventure title with emojis",
   "description": "Detailed description of what to do, where to go, and how to make it fun",
   "location": "Specific location or area within ${location}",
@@ -117,9 +317,9 @@ Return your response in this EXACT JSON format:
   "mood": "${mood}",
   "tips": ["Tip 1", "Tip 2", "Tip 3"],
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
-}
+}`}
 
-Make it sound exciting and use lots of emojis! Be creative and think outside the box.`;
+Make it sound exciting and use lots of emojis! Be creative and think outside the box.${optionsText}`;
 }
 
 // Get duration text from minutes
@@ -134,8 +334,11 @@ function getDurationText(minutes) {
     return durationMap[minutes] || `${minutes} minutes`;
 }
 
-// Call Gemini API
-async function callGeminiAPI(prompt) {
+// Call Gemini API with Streaming
+async function callGeminiAPIWithStreaming(prompt) {
+    // Show streaming container
+    showStreamingContainer();
+    
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
@@ -151,7 +354,7 @@ async function callGeminiAPI(prompt) {
                 temperature: 0.9,
                 topK: 40,
                 topP: 0.95,
-                maxOutputTokens: 1024,
+                maxOutputTokens: 2048,
             }
         })
     });
@@ -163,17 +366,120 @@ async function callGeminiAPI(prompt) {
     const data = await response.json();
     const generatedText = data.candidates[0].content.parts[0].text;
     
+    // Simulate streaming by showing text progressively
+    await simulateStreaming(generatedText);
+    
     // Extract JSON from the response
     const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
         throw new Error('No valid JSON found in response');
     }
     
+    hideStreamingContainer();
     return JSON.parse(jsonMatch[0]);
+}
+
+// Show Streaming Container
+function showStreamingContainer() {
+    const streamContainer = document.createElement('div');
+    streamContainer.id = 'streamContainer';
+    streamContainer.className = 'adventure-stream';
+    streamContainer.innerHTML = `
+        <div class="stream-header">
+            <h3>🎯 Generating your adventure...</h3>
+        </div>
+        <div class="stream-content" id="streamContent">
+            <span class="typing-indicator"></span>
+        </div>
+    `;
+    
+    // Insert before adventure result
+    adventureResult.parentNode.insertBefore(streamContainer, adventureResult);
+    streamContainer.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Hide Streaming Container
+function hideStreamingContainer() {
+    const streamContainer = document.getElementById('streamContainer');
+    if (streamContainer) {
+        streamContainer.remove();
+    }
+}
+
+// Simulate Streaming Effect
+async function simulateStreaming(fullText) {
+    const streamContent = document.getElementById('streamContent');
+    if (!streamContent) return;
+    
+    // Extract just the description part for streaming
+    const jsonMatch = fullText.match(/\{[\s\S]*\}/);
+    let textToStream = fullText;
+    
+    if (jsonMatch) {
+        try {
+            const parsedJson = JSON.parse(jsonMatch[0]);
+            if (parsedJson.description) {
+                textToStream = parsedJson.description;
+            } else if (parsedJson.adventures && parsedJson.adventures[0] && parsedJson.adventures[0].description) {
+                textToStream = parsedJson.adventures[0].description;
+            }
+        } catch (e) {
+            // Use original text if parsing fails
+        }
+    }
+    
+    streamContent.innerHTML = '';
+    const words = textToStream.split(' ');
+    
+    for (let i = 0; i < words.length; i++) {
+        streamContent.innerHTML += words[i] + ' ';
+        streamContent.innerHTML += '<span class="typing-indicator"></span>';
+        
+        // Scroll to keep the streaming visible
+        streamContent.scrollIntoView({ behavior: 'smooth' });
+        
+        // Random delay between 50-150ms for natural feeling
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+        
+        // Remove typing indicator
+        streamContent.innerHTML = streamContent.innerHTML.replace('<span class="typing-indicator"></span>', '');
+    }
 }
 
 // Display the generated adventure
 function displayAdventure(adventure) {
+    const extraDetails = [];
+    
+    if (adventure.budget) {
+        extraDetails.push(`
+            <div class="detail-item">
+                <span class="emoji">💰</span>
+                <div class="label">Budget</div>
+                <div class="value">${adventure.budget}</div>
+            </div>
+        `);
+    }
+    
+    if (adventure.energy) {
+        extraDetails.push(`
+            <div class="detail-item">
+                <span class="emoji">⚡</span>
+                <div class="label">Energy</div>
+                <div class="value">${adventure.energy}</div>
+            </div>
+        `);
+    }
+    
+    if (adventure.isGroup && adventure.friends) {
+        extraDetails.push(`
+            <div class="detail-item">
+                <span class="emoji">👥</span>
+                <div class="label">Group Size</div>
+                <div class="value">${adventure.friends.length + 1} people</div>
+            </div>
+        `);
+    }
+
     const adventureHTML = `
         <div class="adventure-title">
             ${adventure.title}
@@ -197,6 +503,7 @@ function displayAdventure(adventure) {
                 <div class="label">Mood</div>
                 <div class="value">${adventure.mood}</div>
             </div>
+            ${extraDetails.join('')}
         </div>
         ${adventure.tips ? `
         <div class="adventure-tips">
@@ -222,6 +529,55 @@ function displayAdventure(adventure) {
     }, 600);
 }
 
+// Display Multiple Adventures
+function displayMultipleAdventures(adventures) {
+    const adventuresHTML = adventures.map((adventure, index) => `
+        <div class="adventure-option" data-index="${index}" onclick="selectAdventure(${index})">
+            <div class="option-number">${index + 1}</div>
+            <div class="adventure-title">${adventure.title}</div>
+            <div class="adventure-description">${adventure.description}</div>
+            ${adventure.tips ? `
+            <div class="adventure-tips">
+                <h4>💡 Pro Tips:</h4>
+                <ul>
+                    ${adventure.tips.map(tip => `<li>${tip}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+        </div>
+    `).join('');
+    
+    adventureCard.innerHTML = `
+        <div class="multiple-adventures-header">
+            <h3>🎲 Pick Your Adventure!</h3>
+            <p>Choose the one that speaks to you:</p>
+        </div>
+        <div class="multiple-adventures">
+            ${adventuresHTML}
+        </div>
+    `;
+    
+    adventureCard.classList.add('success');
+    setTimeout(() => {
+        adventureCard.classList.remove('success');
+    }, 600);
+}
+
+// Select Adventure from Multiple Options
+function selectAdventure(index) {
+    document.querySelectorAll('.adventure-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    document.querySelector(`[data-index="${index}"]`).classList.add('selected');
+    currentAdventure = multipleAdventures[index];
+    
+    // Show selected adventure after a brief delay
+    setTimeout(() => {
+        displayAdventure(currentAdventure);
+    }, 300);
+}
+
 // Show adventure result section
 function showAdventureResult() {
     adventureSpinner.style.display = 'none';
@@ -239,6 +595,10 @@ function showAdventureSpinner() {
     locationInput.value = '';
     moodSelect.value = '';
     durationSelect.value = '';
+    budgetSelect.value = '';
+    energySelect.value = '';
+    multipleOptionsCheckbox.checked = false;
+    multipleAdventures = [];
     locationInput.focus();
 }
 
@@ -415,7 +775,11 @@ document.querySelector('.logo h1').addEventListener('click', function() {
     }
 });
 
+// Make functions globally available
+window.inviteFriend = inviteFriend;
+window.selectAdventure = selectAdventure;
+
 // Initialize memory capsule visibility
 if (savedMemories.length > 0) {
-    memoryCapsule.style.display = 'block';
+    // Don't auto-show memory capsule, let tabs handle it
 }

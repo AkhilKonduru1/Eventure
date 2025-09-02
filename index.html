@@ -15,12 +15,21 @@
                 <h1>🎯 Eventure</h1>
                 <p>Turn Everyday Moments into Mini-Adventures</p>
             </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="adventures">🎲 Adventures</button>
+                <button class="nav-tab" data-tab="friends">👥 Friends</button>
+                <button class="nav-tab" data-tab="memories">📸 Memories</button>
+            </nav>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Adventure Spinner Section -->
-            <section class="adventure-spinner" id="adventureSpinner">
+            <!-- Adventure Tab Content -->
+            <div class="tab-content" id="adventuresTab">
+                <!-- Adventure Spinner Section -->
+                <section class="adventure-spinner" id="adventureSpinner">
                 <div class="spinner-header">
                     <h2>✨ Adventure Spinner</h2>
                     <p>Tell us your vibe and we'll spin up something amazing!</p>
@@ -57,6 +66,36 @@
                         </select>
                     </div>
 
+                    <!-- Additional Filters -->
+                    <div class="filter-row">
+                        <div class="input-group half-width">
+                            <label for="budget">💰 Budget</label>
+                            <select id="budget">
+                                <option value="">Any budget</option>
+                                <option value="free">Free - $0</option>
+                                <option value="low">Low - Under $20</option>
+                                <option value="medium">Medium - $20-50</option>
+                                <option value="high">High - $50+</option>
+                            </select>
+                        </div>
+                        <div class="input-group half-width">
+                            <label for="energy">⚡ Energy Level</label>
+                            <select id="energy">
+                                <option value="">Any energy</option>
+                                <option value="low">Low - Minimal effort</option>
+                                <option value="medium">Medium - Some activity</option>
+                                <option value="high">High - Full energy!</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="adventure-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="multipleOptions"> 
+                            Generate multiple adventure options
+                        </label>
+                    </div>
+
                     <button class="spin-button" id="spinButton">
                         <span class="button-text">🎲 Spin My Adventure!</span>
                         <div class="spinner" id="spinner" style="display: none;"></div>
@@ -79,19 +118,84 @@
                     <button class="save-btn" id="saveBtn">💾 Save to Memory Capsule</button>
                     <button class="share-btn" id="shareBtn">📱 Share with Friends</button>
                 </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- Memory Capsule Section -->
-            <section class="memory-capsule" id="memoryCapsule" style="display: none;">
+            <!-- Friends Tab Content -->
+            <div class="tab-content" id="friendsTab" style="display: none;">
+                <section class="friends-section">
+                    <div class="friends-header">
+                        <h2>👥 Adventure Buddies</h2>
+                        <p>Plan adventures with your friends!</p>
+                    </div>
+                    
+                    <div class="friends-list">
+                        <div class="friend-card" data-friend="alex">
+                            <div class="friend-avatar">🧑‍🎨</div>
+                            <div class="friend-info">
+                                <h3>Alex Chen</h3>
+                                <p>The Creative One</p>
+                                <div class="friend-mood">Loves: Art, Museums, DIY</div>
+                            </div>
+                            <button class="invite-btn" onclick="inviteFriend('alex')">Invite</button>
+                        </div>
+                        
+                        <div class="friend-card" data-friend="sarah">
+                            <div class="friend-avatar">🏃‍♀️</div>
+                            <div class="friend-info">
+                                <h3>Sarah Kim</h3>
+                                <p>The Active One</p>
+                                <div class="friend-mood">Loves: Sports, Hiking, Outdoors</div>
+                            </div>
+                            <button class="invite-btn" onclick="inviteFriend('sarah')">Invite</button>
+                        </div>
+                        
+                        <div class="friend-card" data-friend="marcus">
+                            <div class="friend-avatar">🍕</div>
+                            <div class="friend-info">
+                                <h3>Marcus Rivera</h3>
+                                <p>The Foodie</p>
+                                <div class="friend-mood">Loves: Restaurants, Cooking, Markets</div>
+                            </div>
+                            <button class="invite-btn" onclick="inviteFriend('marcus')">Invite</button>
+                        </div>
+                        
+                        <div class="friend-card" data-friend="zoe">
+                            <div class="friend-avatar">🎭</div>
+                            <div class="friend-info">
+                                <h3>Zoe Thompson</h3>
+                                <p>The Social Butterfly</p>
+                                <div class="friend-mood">Loves: Parties, Events, Meeting People</div>
+                            </div>
+                            <button class="invite-btn" onclick="inviteFriend('zoe')">Invite</button>
+                        </div>
+                    </div>
+                    
+                    <div class="group-adventure-section">
+                        <h3>🎉 Plan Group Adventure</h3>
+                        <div class="invited-friends" id="invitedFriends">
+                            <p>No friends invited yet. Select some friends above!</p>
+                        </div>
+                        <button class="group-spin-btn" id="groupSpinBtn" disabled>
+                            🎲 Generate Group Adventure
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Memory Capsule Tab Content -->
+            <div class="tab-content" id="memoriesTab" style="display: none;">
+                <section class="memory-capsule" id="memoryCapsule">
                 <div class="capsule-header">
                     <h2>📸 Memory Capsule</h2>
                     <p>Your saved adventures</p>
                 </div>
                 
-                <div class="memories-grid" id="memoriesGrid">
-                    <!-- Saved memories will be displayed here -->
-                </div>
-            </section>
+                    <div class="memories-grid" id="memoriesGrid">
+                        <!-- Saved memories will be displayed here -->
+                    </div>
+                </section>
+            </div>
         </main>
 
         <!-- Footer -->
