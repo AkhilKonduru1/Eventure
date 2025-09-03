@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #f5f7fa;
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
@@ -30,26 +30,48 @@ body {
 }
 
 .logo h1 {
-    font-size: 3.5rem;
-    font-weight: 700;
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientShift 3s ease-in-out infinite;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
 }
 
 .logo p {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 300;
+    font-size: 1rem;
+    color: #7f8c8d;
+    font-weight: 400;
 }
 
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+/* Header user info */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+    background: #c0392b;
 }
 
 /* Main Content */
@@ -62,12 +84,11 @@ body {
 
 /* Adventure Spinner Styles */
 .adventure-spinner {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e8ed;
 }
 
 .spinner-header {
@@ -76,15 +97,15 @@ body {
 }
 
 .spinner-header h2 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .spinner-header p {
     color: #7f8c8d;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 /* Input Form Styles */
@@ -120,9 +141,8 @@ body {
 .input-group input:focus,
 .input-group select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-2px);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .input-group select {
@@ -131,27 +151,25 @@ body {
 
 /* Spin Button */
 .spin-button {
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    background: #3498db;
     color: white;
     border: none;
-    padding: 18px 30px;
-    border-radius: 16px;
-    font-size: 1.2rem;
-    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    margin-top: 10px;
+    transition: background-color 0.2s ease;
+    margin-top: 16px;
+    width: 100%;
 }
 
 .spin-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+    background: #2980b9;
 }
 
 .spin-button:active {
-    transform: translateY(-1px);
+    background: #21618c;
 }
 
 .spin-button:disabled {
@@ -177,13 +195,11 @@ body {
 
 /* Adventure Result Styles */
 .adventure-result {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    animation: slideIn 0.5s ease-out;
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e8ed;
 }
 
 @keyframes slideIn {
@@ -207,49 +223,38 @@ body {
 }
 
 .result-header h2 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 600;
     color: #2c3e50;
 }
 
 .new-adventure-btn {
-    background: linear-gradient(45deg, #96ceb4, #45b7d1);
+    background: #95a5a6;
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s;
 }
 
 .new-adventure-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(150, 206, 180, 0.3);
+    background: #7f8c8d;
 }
 
 /* Adventure Card */
 .adventure-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 25px;
-    border-left: 5px solid #4ecdc4;
-    position: relative;
-    overflow: hidden;
+    background: #fafbfc;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+    border: 1px solid #e1e8ed;
 }
 
-.adventure-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
-    pointer-events: none;
-}
+/* Removed excessive decoration */
 
 .adventure-title {
     font-size: 1.8rem;
@@ -283,9 +288,10 @@ body {
 }
 
 .detail-item .emoji {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
+    opacity: 0.8;
 }
 
 .detail-item .label {
@@ -321,29 +327,30 @@ body {
 }
 
 .save-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    background: #27ae60;
     color: white;
 }
 
 .share-btn {
-    background: linear-gradient(45deg, #4ecdc4, #6dd5ed);
+    background: #3498db;
     color: white;
 }
 
-.save-btn:hover,
+.save-btn:hover {
+    background: #229954;
+}
+
 .share-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    background: #2980b9;
 }
 
 /* Memory Capsule Styles */
 .memory-capsule {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e8ed;
 }
 
 .capsule-header {
@@ -352,15 +359,15 @@ body {
 }
 
 .capsule-header h2 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .capsule-header p {
     color: #7f8c8d;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .memories-grid {
@@ -370,16 +377,16 @@ body {
 }
 
 .memory-item {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 16px;
-    padding: 20px;
-    border-left: 4px solid #ff6b6b;
-    transition: all 0.3s ease;
+    background: #fafbfc;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid #3498db;
+    border: 1px solid #e1e8ed;
+    transition: box-shadow 0.2s ease;
 }
 
 .memory-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .memory-date {
@@ -403,9 +410,11 @@ body {
 /* Footer */
 .footer {
     text-align: center;
-    padding: 30px 0;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
+    padding: 24px 0;
+    color: #95a5a6;
+    font-size: 0.9rem;
+    border-top: 1px solid #e1e8ed;
+    margin-top: 40px;
 }
 
 /* Responsive Design */
@@ -444,13 +453,18 @@ body {
 
 @media (max-width: 480px) {
     .logo h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 16px;
     }
     
     .spinner-header h2,
     .result-header h2,
     .capsule-header h2 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
     
     .adventure-spinner,
@@ -462,17 +476,152 @@ body {
 
 /* Loading Animation */
 .loading {
-    opacity: 0.6;
+    opacity: 0.7;
     pointer-events: none;
 }
 
-/* Success Animation */
-.success {
-    animation: successPulse 0.6s ease-out;
+/* Remove excessive animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-@keyframes successPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+.adventure-result {
+    animation: slideIn 0.3s ease-out;
+}
+
+.success {
+    /* Removed excessive pulse animation */
+}
+
+/* Authentication Modal */
+.auth-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.auth-content {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.auth-content h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: #7f8c8d;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.auth-tab.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-form input {
+    padding: 12px;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.auth-form button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.auth-form button:hover {
+    background: #2980b9;
+}
+
+/* Adventure details styling */
+.adventure-tips {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #3498db;
+}
+
+.adventure-tips h4 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.adventure-tips ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.adventure-tips li {
+    margin-bottom: 6px;
+    color: #34495e;
+}
+
+.adventure-hashtags {
+    margin-top: 16px;
+    padding: 12px;
+    background: #ecf0f1;
+    border-radius: 6px;
+}
+
+.adventure-hashtags p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0;
 }
